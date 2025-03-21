@@ -7,18 +7,24 @@ Aplicación web que permite descargar videos de YouTube en formato MP3 con la m�
 - Interfaz de usuario simple e intuitiva
 - Obtención de información del video (título, miniatura, duración)
 - Descarga de audio en formato MP3 con alta calidad
+- Soporte para yt-dlp para descargar videos con restricciones
+- Tema claro/oscuro
+- Personalización de colores de la interfaz
+- Sistema de alertas visuales
+- Manejo mejorado de diferentes formatos de URL de YouTube
 - Listo para desplegar en Vercel
 
 ## Requisitos
 
 - Node.js 14 o superior
 - npm o yarn
+- yt-dlp (opcional, recomendado para mejor compatibilidad)
 
 ## Instalación
 
 1. Clona este repositorio:
 ```
-git clone <url-repositorio>
+git clone https://github.com/Bjohan23/youtube-to-mp3.git
 cd youtube-to-mp3
 ```
 
@@ -26,6 +32,12 @@ cd youtube-to-mp3
 ```
 npm install
 ```
+
+3. (Opcional) Instala yt-dlp para mejorar la compatibilidad con videos protegidos:
+   - Windows (con chocolatey): `choco install yt-dlp`
+   - Windows (manual): Descarga desde https://github.com/yt-dlp/yt-dlp/releases y añádelo al PATH
+   - macOS: `brew install yt-dlp`
+   - Linux: `apt/dnf/pacman install yt-dlp`
 
 ## Uso
 
@@ -65,13 +77,16 @@ vercel
 - Esta aplicación está destinada solo para uso personal
 - Descarga únicamente contenido del cual tengas derechos o que esté bajo licencias que permitan su descarga
 - YouTube puede cambiar su API en cualquier momento, lo que podría afectar la funcionalidad
+- Algunos videos con restricciones especiales pueden requerir yt-dlp para su descarga
 
 ## Tecnologías utilizadas
 
 - Node.js
 - Express.js
 - ytdl-core
-- Bootstrap 5
+- yt-dlp (opcional)
+- Tailwind CSS
+- JavaScript
 
 ## Licencia
 
