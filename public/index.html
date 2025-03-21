@@ -4,103 +4,224 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Convertidor de YouTube a MP3</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Configuración de Tailwind con tema personalizable
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: 'var(--color-primary)',
+              hover: 'var(--color-primary-hover)'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    :root {
+      --color-primary: #ff5e62;
+      --color-primary-hover: #ff9966;
     }
-    .container {
-      max-width: 700px;
+    
+    .gradient-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
     }
-    .header {
-      background: linear-gradient(135deg, #ff5e62, #ff9966);
-      color: white;
-      padding: 2rem 0;
-      border-radius: 0 0 20px 20px;
-      margin-bottom: 2rem;
+    
+    .alert-animation {
+      animation: slideIn 0.3s ease-out forwards;
     }
-    .converter-card {
-      background-color: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-    .btn-download {
-      background: linear-gradient(135deg, #ff5e62, #ff9966);
-      border: none;
-      font-weight: bold;
-    }
-    .btn-download:hover {
-      background: linear-gradient(135deg, #ff9966, #ff5e62);
-    }
-    .video-info {
-      background-color: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      padding: 1.5rem;
-      display: none;
-    }
-    .video-thumbnail {
-      width: 100%;
-      border-radius: 10px;
-    }
-    .loader {
-      display: none;
-    }
-    footer {
-      margin-top: 2rem;
-      color: #6c757d;
+    
+    @keyframes slideIn {
+      0% { transform: translateY(-20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
-<body>
-  <div class="header text-center">
-    <h1 class="fw-bold">Convertidor YouTube a MP3</h1>
-    <p class="lead">Descarga música de YouTube en alta calidad</p>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+  <div id="alert-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md"></div>
+
+  <div class="gradient-primary text-white py-8 rounded-b-3xl shadow-lg mb-8">
+    <div class="container mx-auto px-4 text-center">
+      <h1 class="text-3xl font-bold mb-2">Convertidor YouTube a MP3</h1>
+      <p class="text-xl">Descarga música de YouTube en alta calidad</p>
+      <div class="flex justify-center mt-4 space-x-4">
+        <!-- Toggle modo oscuro -->
+        <button id="theme-toggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition">
+          <svg id="sun-icon" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />
+          </svg>
+          <svg id="moon-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+          </svg>
+        </button>
+        
+        <!-- Selector de color -->
+        <button id="color-picker-toggle" class="p-2 rounded-full bg-white/20 hover:bg-white/30 transition">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="container">
-    <div class="converter-card">
-      <h2 class="mb-4 text-center">Ingresa la URL del video de YouTube</h2>
+  <!-- Panel de selección de color (oculto por defecto) -->
+  <div id="color-picker-panel" class="fixed top-24 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-40 hidden">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Personalizar colores</h3>
+    <div class="grid grid-cols-4 gap-2">
+      <button data-color="#ff5e62" data-hover="#ff9966" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #ff5e62, #ff9966);"></button>
+      <button data-color="#3b82f6" data-hover="#60a5fa" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);"></button>
+      <button data-color="#10b981" data-hover="#34d399" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #10b981, #34d399);"></button>
+      <button data-color="#8b5cf6" data-hover="#a78bfa" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);"></button>
+      <button data-color="#ec4899" data-hover="#f472b6" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #ec4899, #f472b6);"></button>
+      <button data-color="#f59e0b" data-hover="#fbbf24" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);"></button>
+      <button data-color="#ef4444" data-hover="#f87171" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #ef4444, #f87171);"></button>
+      <button data-color="#6366f1" data-hover="#818cf8" class="w-8 h-8 rounded-full" style="background: linear-gradient(135deg, #6366f1, #818cf8);"></button>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 max-w-2xl">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">Ingresa la URL del video de YouTube</h2>
       <form id="converterForm" autocomplete="off">
-        <div class="mb-3">
-          <input type="text" id="videoUrl" class="form-control form-control-lg" placeholder="https://www.youtube.com/watch?v=..." required>
+        <div class="mb-4">
+          <input type="text" id="videoUrl" class="w-full px-4 py-3 text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://www.youtube.com/watch?v=..." required>
         </div>
-        <div class="d-grid gap-2">
-          <button type="submit" class="btn btn-download btn-lg text-white">Convertir a MP3</button>
-        </div>
+        <button type="submit" class="w-full py-3 text-lg font-bold text-white rounded-lg gradient-primary hover:opacity-90 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          Convertir a MP3
+        </button>
       </form>
       
-      <div class="text-center mt-3">
-        <div class="spinner-border text-primary loader" id="loader" role="status">
-          <span class="visually-hidden">Cargando...</span>
+      <div class="text-center mt-4">
+        <div id="loader" class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent hidden"></div>
+      </div>
+    </div>
+
+    <div id="videoInfo" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8 hidden">
+      <div class="flex flex-col md:flex-row gap-6">
+        <div class="md:w-5/12">
+          <img id="videoThumbnail" class="w-full rounded-lg object-cover" src="" alt="Miniatura del video">
+        </div>
+        <div class="md:w-7/12">
+          <h3 id="videoTitle" class="text-xl font-bold mb-3 text-gray-800 dark:text-white"></h3>
+          <p class="text-gray-600 dark:text-gray-300 mb-4">Duración: <span id="videoDuration"></span></p>
+          <a id="downloadBtn" href="#" class="block w-full py-3 text-center text-lg font-bold text-white rounded-lg gradient-primary hover:opacity-90 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Descargar MP3
+          </a>
         </div>
       </div>
     </div>
 
-    <div class="video-info" id="videoInfo">
-      <div class="row">
-        <div class="col-md-5">
-          <img id="videoThumbnail" class="video-thumbnail" src="" alt="Miniatura del video">
-        </div>
-        <div class="col-md-7">
-          <h3 id="videoTitle" class="fs-5 fw-bold"></h3>
-          <p>Duración: <span id="videoDuration"></span></p>
-          <div class="d-grid gap-2">
-            <a id="downloadBtn" href="#" class="btn btn-download btn-lg text-white">Descargar MP3</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <footer class="text-center">
-      <p>Esta herramienta es solo para uso personal. Descarga solo contenido del cual tengas derechos.</p>
+    <footer class="text-center mb-8">
+      <p class="text-gray-600 dark:text-gray-400">Esta herramienta es solo para uso personal. Descarga solo contenido del cual tengas derechos.</p>
     </footer>
   </div>
 
   <script>
+    // Función para mostrar alertas
+    function showAlert(message, type = 'error') {
+      const alertContainer = document.getElementById('alert-container');
+      const alertId = 'alert-' + Date.now();
+      
+      const alertEl = document.createElement('div');
+      alertEl.id = alertId;
+      alertEl.className = 'mb-3 p-4 rounded-lg shadow-lg alert-animation flex items-center justify-between';
+      
+      // Configurar estilo según el tipo
+      if (type === 'error') {
+        alertEl.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-200', 'dark:text-red-900');
+      } else if (type === 'success') {
+        alertEl.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-200', 'dark:text-green-900');
+      } else {
+        alertEl.classList.add('bg-blue-100', 'text-blue-800', 'dark:bg-blue-200', 'dark:text-blue-900');
+      }
+      
+      // Contenido de la alerta
+      alertEl.innerHTML = `
+        <div class="flex items-center">
+          ${type === 'error' ? 
+            '<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>' :
+            '<svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>'
+          }
+          <span>${message}</span>
+        </div>
+        <button onclick="this.parentNode.remove()" class="ml-3 text-gray-500 hover:text-gray-800 dark:hover:text-white">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+        </button>
+      `;
+      
+      alertContainer.appendChild(alertEl);
+      
+      // Auto-remover después de 5 segundos
+      setTimeout(() => {
+        const alert = document.getElementById(alertId);
+        if (alert) alert.remove();
+      }, 5000);
+    }
+
+    // Inicializar tema según preferencia guardada
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme');
+      const isDark = savedTheme === 'dark' || 
+                     (savedTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('sun-icon').classList.remove('hidden');
+        document.getElementById('moon-icon').classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('sun-icon').classList.add('hidden');
+        document.getElementById('moon-icon').classList.remove('hidden');
+      }
+    }
+
+    // Inicializar colores según preferencia guardada
+    function initColors() {
+      const savedPrimary = localStorage.getItem('colorPrimary') || '#ff5e62';
+      const savedHover = localStorage.getItem('colorPrimaryHover') || '#ff9966';
+      
+      document.documentElement.style.setProperty('--color-primary', savedPrimary);
+      document.documentElement.style.setProperty('--color-primary-hover', savedHover);
+    }
+
+    // Cambiar tema (claro/oscuro)
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      
+      document.getElementById('sun-icon').classList.toggle('hidden', !isDark);
+      document.getElementById('moon-icon').classList.toggle('hidden', isDark);
+      
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // Toggle del selector de color
+    document.getElementById('color-picker-toggle').addEventListener('click', function() {
+      const panel = document.getElementById('color-picker-panel');
+      panel.classList.toggle('hidden');
+    });
+
+    // Cambiar color al hacer clic en una opción
+    document.querySelectorAll('#color-picker-panel button').forEach(button => {
+      button.addEventListener('click', function() {
+        const primary = this.getAttribute('data-color');
+        const hover = this.getAttribute('data-hover');
+        
+        document.documentElement.style.setProperty('--color-primary', primary);
+        document.documentElement.style.setProperty('--color-primary-hover', hover);
+        
+        localStorage.setItem('colorPrimary', primary);
+        localStorage.setItem('colorPrimaryHover', hover);
+        
+        document.getElementById('color-picker-panel').classList.add('hidden');
+      });
+    });
+
+    // Manejar envío del formulario
     document.getElementById('converterForm').addEventListener('submit', async function(event) {
       event.preventDefault();
       
@@ -108,8 +229,8 @@
       if (!videoUrl) return;
       
       // Mostrar loader
-      document.getElementById('loader').style.display = 'inline-block';
-      document.getElementById('videoInfo').style.display = 'none';
+      document.getElementById('loader').classList.remove('hidden');
+      document.getElementById('videoInfo').classList.add('hidden');
       
       try {
         // Obtener información del video
@@ -121,11 +242,11 @@
           body: JSON.stringify({ url: videoUrl })
         });
         
-        if (!response.ok) {
-          throw new Error('Error al procesar la URL');
-        }
-        
         const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Error al procesar la URL');
+        }
         
         // Mostrar información del video
         document.getElementById('videoTitle').textContent = data.title;
@@ -136,18 +257,43 @@
         const seconds = data.duration % 60;
         document.getElementById('videoDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         
-        // Configurar botón de descarga
-        document.getElementById('downloadBtn').href = `/api/download?url=${encodeURIComponent(videoUrl)}`;
+        // Configurar botón de descarga con manejador de errores
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.href = `/api/download?url=${encodeURIComponent(videoUrl)}`;
+        downloadBtn.addEventListener('click', async function(e) {
+          // No prevenir la navegación por defecto para permitir la descarga normal
+          // Pero añadir un manejador para capturar posibles errores de la API
+          try {
+            const checkResponse = await fetch(this.href, { method: 'HEAD' });
+            if (!checkResponse.ok) {
+              // Si es un error, leer el contenido para mostrar el mensaje específico
+              const errorResponse = await fetch(this.href);
+              const errorData = await errorResponse.json();
+              e.preventDefault(); // Prevenir la navegación solo si hay error
+              throw new Error(errorData.error || 'Error en la descarga');
+            }
+            // Si no hay error, la descarga procederá normalmente
+          } catch (error) {
+            e.preventDefault();
+            showAlert(error.message, 'error');
+          }
+        });
         
         // Mostrar información del video
-        document.getElementById('videoInfo').style.display = 'block';
+        document.getElementById('videoInfo').classList.remove('hidden');
       } catch (error) {
-        alert('Error: ' + error.message);
+        showAlert(error.message, 'error');
       } finally {
         // Ocultar loader
-        document.getElementById('loader').style.display = 'none';
+        document.getElementById('loader').classList.add('hidden');
       }
+    });
+
+    // Inicializar tema y colores al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initTheme();
+      initColors();
     });
   </script>
 </body>
-</html> 
+</html>
