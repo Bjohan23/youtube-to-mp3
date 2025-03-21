@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertidor de YouTube a MP3</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 700px;
+    }
+    .header {
+      background: linear-gradient(135deg, #ff5e62, #ff9966);
+      color: white;
+      padding: 2rem 0;
+      border-radius: 0 0 20px 20px;
+      margin-bottom: 2rem;
+    }
+    .converter-card {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .btn-download {
+      background: linear-gradient(135deg, #ff5e62, #ff9966);
+      border: none;
+      font-weight: bold;
+    }
+    .btn-download:hover {
+      background: linear-gradient(135deg, #ff9966, #ff5e62);
+    }
+    .video-info {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      display: none;
+    }
+    .video-thumbnail {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .loader {
+      display: none;
+    }
+    footer {
+      margin-top: 2rem;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="header text-center">
+    <h1 class="fw-bold">Convertidor YouTube a MP3</h1>
+    <p class="lead">Descarga música de YouTube en alta calidad</p>
+  </div>
+
+  <div class="container">
+    <div class="converter-card">
+      <h2 class="mb-4 text-center">Ingresa la URL del video de YouTube</h2>
+      <form id="converterForm" autocomplete="off">
+        <div class="mb-3">
+          <input type="text" id="videoUrl" class="form-control form-control-lg" placeholder="https://www.youtube.com/watch?v=..." required>
+        </div>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-download btn-lg text-white">Convertir a MP3</button>
+        </div>
+      </form>
+      
+      <div class="text-center mt-3">
+        <div class="spinner-border text-primary loader" id="loader" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="video-info" id="videoInfo">
+      <div class="row">
+        <div class="col-md-5">
+          <img id="videoThumbnail" class="video-thumbnail" src="" alt="Miniatura del video">
+        </div>
+        <div class="col-md-7">
+          <h3 id="videoTitle" class="fs-5 fw-bold"></h3>
+          <p>Duración: <span id="videoDuration"></span></p>
+          <div class="d-grid gap-2">
+            <a id="downloadBtn" href="#" class="btn btn-download btn-lg text-white">Descargar MP3</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center">
+      <p>Esta herramienta es solo para uso personal. Descarga solo contenido del cual tengas derechos.</p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('converterForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      
+      const videoUrl = document.getElementById('videoUrl').value.trim();
+      if (!videoUrl) return;
+      
+      // Mostrar loader
+      document.getElementById('loader').style.display = 'inline-block';
+      document.getElementById('videoInfo').style.display = 'none';
+      
+      try {
+        // Obtener información del video
+        const response = await fetch('/api/info', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url: videoUrl })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al procesar la URL');
+        }
+        
+        const data = await response.json();
+        
+        // Mostrar información del video
+        document.getElementById('videoTitle').textContent = data.title;
+        document.getElementById('videoThumbnail').src = data.thumbnail;
+        
+        // Formatear duración
+        const minutes = Math.floor(data.duration / 60);
+        const seconds = data.duration % 60;
+        document.getElementById('videoDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        // Configurar botón de descarga
+        document.getElementById('downloadBtn').href = `/api/download?url=${encodeURIComponent(videoUrl)}`;
+        
+        // Mostrar información del video
+        document.getElementById('videoInfo').style.display = 'block';
+      } catch (error) {
+        alert('Error: ' + error.message);
+      } finally {
+        // Ocultar loader
+        document.getElementById('loader').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html> 

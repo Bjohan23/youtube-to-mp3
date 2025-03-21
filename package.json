@@ -1,0 +1,30 @@
+{
+  "name": "youtube-to-mp3",
+  "version": "1.0.0",
+  "description": "Aplicación web para convertir videos de YouTube a MP3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [
+    "youtube",
+    "mp3",
+    "converter",
+    "downloader",
+    "audio"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "ytdl-core": "npm:@distube/ytdl-core@^4.16.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
